@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Routes, Route, Link, useNavigate, Outlet } from "react-router-dom";
 import Detail from "./Detail";
 import axios from "axios";
+import Cart from "./Cart";
 
 function App() {
   let [shoes, setShoes] = useState(data);
@@ -81,6 +82,8 @@ function App() {
           <Route path="one" element={<div>첫 주문 시 양배추즙 서비스</div>} />
           <Route path="two" element={<div> 생일 기념 쿠폰 받기</div>} />
         </Route>
+
+        <Route path="/cart" element={<Cart />} />
       </Routes>
     </div>
   );
@@ -88,7 +91,12 @@ function App() {
 function List({ data }) {
   return (
     <Col sm>
-      <img src={data.img} width="100%" />
+      <img
+        src={
+          "https://codingapple1.github.io/shop/shoes" + (data.id + 1) + ".jpg"
+        }
+        width="100%"
+      />
       <h4>{data.title}</h4>
       <p>{data.content}</p>
     </Col>

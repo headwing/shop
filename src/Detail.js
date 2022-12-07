@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Nav } from "react-bootstrap";
 
 const Detail = (props) => {
   let shoes = props.shoes;
@@ -10,6 +11,8 @@ const Detail = (props) => {
   const [discount, setDiscount] = useState(true);
   const [count, setCount] = useState(0);
   const [num, setNum] = useState("");
+  const [tab, setTab] = useState(0);
+  const [fade, setFade] = useState("");
 
   // useEffect는 html을 먼저 불러오고 나중에 실행할 부가적이고 오래걸리는 기능들을 구현할 때 쓴다.
   // 예를 들어 서버로 데이터 요청하는 코드의 경우 시간이 오래걸리므로 useEffect로 짠다.
@@ -42,8 +45,19 @@ const Detail = (props) => {
     }
   }, [num]);
 
+  useEffect(() => {
+    let a = setTimeout(() => {
+      setFade("end"); // 그냥 setFade("end")를 하면 배치때문에 return에 있는 setFade("")가 하나로 합쳐져서 무시됨
+    }, 10); // 참고로 automatic batching 기능은 state변경함수를 여러번 실행할 때마다 재렌더링해주는 것이 아니라, state 변경처리를 다 하고 맨 마지막 것만 재렌더링을 한번만 해주는 것임.
+
+    return () => {
+      clearTimeout(a);
+      setFade("");
+    };
+  }, []);
+
   return (
-    <div className="container">
+    <div className={"container start " + fade}>
       {discount === true ? <Discount /> : null}
       <input
         onChange={(e) => {
@@ -64,12 +78,77 @@ const Detail = (props) => {
           <button className="btn btn-danger">주문하기</button>
         </div>
       </div>
+
+      <Nav variant="tabs" defaultActiveKey="link0">
+        <Nav.Item>
+          <Nav.Link onClick={() => setTab(0)} eventKey="link0">
+            버튼0
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            onClick={() => {
+              setTab(1);
+            }}
+            eventKey="link1"
+          >
+            버튼1
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            onClick={() => {
+              setTab(2);
+            }}
+            eventKey="link2"
+          >
+            버튼2
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+      {/* 이런식으로 해도 되지만, 이렇게 하려면 삼항연산자를 넣은 {}를 세개나 만들어야함!
+      {
+        tab === 0 ? <div>내용0</div> : null
+      } */}
+      <TabContent tab={tab} shoes={shoes} />
     </div>
   );
 };
 
 const Discount = () => {
   return <div className="alert alert-warning">2초이내 구매시 할인</div>;
+};
+
+const TabContent = ({ tab, shoes }) => {
+  // if문 사용하거나 배열로 바꿔서 사용하거나 둘다 가능!!!
+  // if (tab === 0) return <div>내용0</div>;
+  // else if (tab === 1) return <div>내용1</div>;
+  // else if (tab === 2) return <div>내용2</div>;
+  const [fade, setFade] = useState("");
+
+  useEffect(() => {
+    let a = setTimeout(() => {
+      setFade("end"); // 그냥 setFade("end")를 하면 배치때문에 return에 있는 setFade("")가 하나로 합쳐져서 무시됨
+    }, 10); // 참고로 automatic batching 기능은 state변경함수를 여러번 실행할 때마다 재렌더링해주는 것이 아니라, state 변경처리를 다 하고 맨 마지막 것만 재렌더링을 한번만 해주는 것임.
+
+    return () => {
+      clearTimeout(a);
+      setFade("");
+    };
+  }, [tab]);
+
+  // 클래스명을 여러개 쓸 때 중간에 띄어쓰기해야 한다는 것 주의!!
+  return (
+    <div className={"start " + fade}>
+      {
+        [
+          <div>{shoes[0].title}</div>,
+          <div>{shoes[1].title}</div>,
+          <div>{shoes[2].title}</div>,
+        ][tab]
+      }
+    </div>
+  );
 };
 
 export default Detail;
